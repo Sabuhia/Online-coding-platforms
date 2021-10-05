@@ -1,0 +1,19 @@
+select distinct company.company_code,company.founder, l.lmc, s.smc, m.mc, e.ec from company
+    left join
+        (select company_code, count(distinct lead_manager_code) as lmc from lead_manager
+        group by company_code) as l
+    on company.company_code=l.company_code
+    left join
+        (select company_code, count(distinct senior_manager_code) as smc from senior_manager
+        group by company_code) as s
+    on company.company_code=s.company_code
+    left join
+        (select company_code, count(distinct manager_code) as mc from manager
+        group by company_code)as m
+    on company.company_code=m.company_code
+    left join
+        (select company_code, count(distinct employee_code) as ec from employee
+        group by company_code) as e
+    on company.company_code=e.company_code
+order by company.company_code
+;

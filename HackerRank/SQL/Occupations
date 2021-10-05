@@ -1,0 +1,37 @@
+create view doc as
+    select 
+    row_number() over() as id,
+    case when occupation='Doctor' then name end as doctor
+    from occupations
+    order by case when doctor is NULL then 1 else 0 end, doctor
+;
+create view pro as
+    select 
+    row_number() over() as id,
+    case when occupation='Professor' then name end as professor
+    from occupations
+    order by case when professor is NULL then 1 else 0 end, professor
+;
+create view sing as
+    select 
+    row_number() over() as id,
+    case when occupation='Singer' then name end as singer
+    from occupations
+    order by case when singer is NULL then 1 else 0 end, singer
+;
+create view act as
+    select 
+    row_number() over() as id,
+    case when occupation='Actor' then name end as actor
+    from occupations
+    order by case when actor is NULL then 1 else 0 end, actor
+;
+select doctor, professor, singer, actor from doc
+    left join pro
+    on doc.id=pro.id
+    left join sing
+    on pro.id=sing.id
+    left join act
+    on sing.id=act.id
+where (doctor and professor and singer and actor) is not NULL
+ ;   

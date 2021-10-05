@@ -1,2 +1,1 @@
-# Hackerrank
-Some interesting problems solutions 
+Here i will post some of the interesting problems I've solved

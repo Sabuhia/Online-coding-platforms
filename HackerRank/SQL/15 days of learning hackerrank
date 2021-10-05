@@ -1,0 +1,60 @@
+select dt,mxx,id,nm from
+(select s1.sdate as dt,s2.ct as mxx, s3.mxs, s4.mn as id, hackers.name as nm from (select distinct submission_date as sdate from submissions) as s1
+
+left join 
+    (
+        select 
+submission_date as sdate,
+
+( SELECT COUNT(distinct hacker_id)  
+ FROM Submissions t2  
+ WHERE t2.submission_date = t1.submission_date AND    (SELECT COUNT(distinct t3.submission_date) FROM      Submissions t3 WHERE t3.hacker_id = t2.hacker_id AND t3.submission_date < t1.submission_date) = dateDIFF(t1.submission_date , '2016-03-01')) as ct
+ 
+ from 
+(select distinct submission_date from submissions) t1
+group by sdate
+    ) as s2
+on s1.sdate = s2.sdate
+
+left join 
+    (select sdate, max(ct) as mxs from (
+select sdate, min(id) as mn, ct from
+    (
+        select submission_date as sdate,hacker_id as id, count(submission_id) as ct from submissions
+        group by sdate,hacker_id
+        
+    ) as s03
+     group by sdate, ct)as s13
+    group by sdate) as s3
+on s2.sdate=s3.sdate
+
+left join
+    (
+        select sdate, min(id) as mn, ct from
+    (
+        select submission_date as sdate,hacker_id as id, count(submission_id) as ct from submissions
+        group by sdate,hacker_id
+        
+    ) as s04
+     group by sdate, ct
+    )as s4
+on s3.mxs = s4.ct and s3.sdate=s4.sdate
+
+left join hackers
+on s4.mn = hackers.hacker_id
+
+order by s1.sdate
+)tbl
+
+
+ 
+
+-- CORRECT UNIQUE HACKERS FOR EACH SPECIFIC DAY
+-- set @d=1;
+-- select  s.hacker_id as id,
+--         count(distinct s.submission_date) as cdt
+-- from submissions as s
+-- where day(s.submission_date)<=@d
+-- group by id
+-- having cdt=@d
+;

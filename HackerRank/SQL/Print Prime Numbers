@@ -1,0 +1,42 @@
+-- this code allows to find all numbers <=1000 with any given amount of divisors(non 1). For our prime we set # = 1
+set @divisor_count=1;
+
+select group_concat(number separator '&')
+
+from(
+select numbers1.n as number, count(numbers2.n) as divcount from(
+select *
+    
+-- creating table of 1000 numbers
+    
+from (
+    select @n1:=@n1+1 as n from
+    information_schema.tables t1,
+    information_schema.tables t2,
+    (select @n1:=1) tmp
+) nn 
+where n<=1000
+)numbers1
+    
+-- joining each number with it divisors except 1 from table of 1000 numbers
+ 
+left join (
+select *
+from (
+    select @n2:=@n2+1 as n from
+    information_schema.tables t1,
+    information_schema.tables t2,
+    (select @n2:=1) tmp
+) nn 
+where n<=1000
+)numbers2 
+
+on mod(numbers1.n,numbers2.n)=0 
+    
+-- counting divisors 
+ 
+group by number
+)main
+
+where divcount = @divisor_count
+;

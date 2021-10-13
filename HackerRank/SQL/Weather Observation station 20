@@ -1,0 +1,4 @@
+set @half=(select ceiling(count(*)/2) from station);
+select format(lat_n,4) from (select row_number() over(order by lat_n asc) as nm, lat_n from station)tbl
+where nm=@half
+;

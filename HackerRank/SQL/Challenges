@@ -1,0 +1,17 @@
+select hackers.hacker_id as id,hackers.name as name,                                          count(challenges.challenge_id) as cnt from hackers
+left join challenges
+on hackers.hacker_id = challenges.hacker_id
+
+group by id, name
+having 
+    cnt = (select max(ct) from(select hacker_id, count(challenge_id) as ct from challenges group by hacker_id order by ct)t)
+
+    or
+
+    cnt in (select uniq from(select t.ct as uniq, count(t.ct) as ctt from(select hacker_id as id, count(challenge_id) as ct from challenges group by hacker_id order by ct)t group by t.ct having ctt=1)tt)
+
+order by cnt desc, id asc
+
+;
+
+

@@ -1,0 +1,17 @@
+select id, name 
+from(
+select  submissions.hacker_id as id,
+        hackers.name as name,
+        -- submissions.challenge_id,
+        -- challenges.difficulty_level,
+        sum(case when submissions.score = difficulty.score then 1 else 0 end) as cnt 
+from submissions
+left join hackers on submissions.hacker_id= hackers.hacker_id
+left join challenges on submissions.challenge_id = challenges.challenge_id
+left join difficulty on challenges.difficulty_level = difficulty.difficulty_level
+
+group by id, name
+having cnt > 1)tbl
+
+order by cnt desc, id asc
+;

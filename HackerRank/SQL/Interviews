@@ -1,10 +1,11 @@
-select s1.cid,s1.hid,s1.name,s1.sts,s2.stas,s3.stw,s4.stuw
+select s1.cid,s1.hid,s1.name,s1.sts,s1.stas,s2.stw,s2.stuw
 from
 (
 select  contests.contest_id as cid,
         contests.hacker_id as hid,
         contests.name as name,
-        sum(submission_stats.total_submissions) as sts
+        sum(submission_stats.total_submissions) as sts,
+        sum(submission_stats.total_accepted_submissions) as stas
 from
         contests
 left join 
@@ -25,50 +26,7 @@ left join
     select  contests.contest_id as cid,
         contests.hacker_id as hid,
         contests.name as name,
-        sum(submission_stats.total_accepted_submissions) as stas
-    from
-        contests
-    left join 
-        colleges
-        on contests.contest_id = colleges.contest_id
-    left join
-        challenges
-        on colleges.college_id = challenges.college_id
-    left join
-        submission_stats
-        on challenges.challenge_id = submission_stats.challenge_id
-
-    group by contests.contest_id, contests.hacker_id, contests.name
-    )s2
-    on s1.cid = s2.cid
-
-left join
-    (
-    select  contests.contest_id as cid,
-        contests.hacker_id as hid,
-        contests.name as name,
-        sum(view_stats.total_views) as stw
-    from
-        contests
-    left join 
-        colleges
-        on contests.contest_id = colleges.contest_id
-    left join
-        challenges
-        on colleges.college_id = challenges.college_id
-    left join
-        view_stats
-        on challenges.challenge_id = view_stats.challenge_id
-
-    group by contests.contest_id, contests.hacker_id, contests.name
-    )s3
-    on s2.cid = s3.cid
-
-left join
-    (
-    select  contests.contest_id as cid,
-        contests.hacker_id as hid,
-        contests.name as name,
+        sum(view_stats.total_views) as stw,
         sum(view_stats.total_unique_views) as stuw
     from
         contests
@@ -83,8 +41,9 @@ left join
         on challenges.challenge_id = view_stats.challenge_id
 
     group by contests.contest_id, contests.hacker_id, contests.name
-    )s4
-    on s3.cid = s4.cid
+    )s2
+    on s1.cid = s2.cid
 
-where s1.sts+s2.stas+s3.stw+s4.stuw>0
+
+where s1.sts+s1.stas+s2.stw+s2.stuw>0
 ;
